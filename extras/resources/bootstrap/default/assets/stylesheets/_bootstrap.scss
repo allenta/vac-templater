@@ -48,3 +48,83 @@
 // Utility classes
 @import "bootstrap/utilities";
 @import "bootstrap/responsive-utilities";
+
+
+/******************************************************************************
+ * Customizations.
+ ******************************************************************************/
+
+// Fixed width.
+
+.container {
+  padding: 0;
+  .navbar-right {
+    margin-right: 0;
+  }
+}
+
+// Avoid navbar collapsing.
+
+.navbar-nav {
+  margin: 0;
+  &, > li {
+    float: left;
+  }
+}
+
+// Modals.
+
+.modal {
+  .modal-header h3 {
+    margin: 0;
+  }
+  .modal-body {
+    overflow-y: auto;
+    max-height: 400px;
+    form {
+      margin: 0px;
+    }
+  }
+}
+
+/******************************************************************************
+ * Glyphicon aliases.
+ ******************************************************************************/
+
+.glyphicon-sort-direction-none {
+  @extend .glyphicon-arrow-right;
+  color: transparent !important;
+}
+
+.glyphicon-sort-direction-asc {
+  @extend .glyphicon-arrow-up;
+}
+
+.glyphicon-sort-direction-desc {
+  @extend .glyphicon-arrow-down;
+}
+
+/******************************************************************************
+ * Extra components.
+ ******************************************************************************/
+
+// Header sections.
+@for $i from 1 through 6 {
+  h#{$i}.section {
+    border-bottom: 1px solid $legend-border-color;
+    margin-bottom: 20px;
+  }
+}
+
+// Collection filters.
+.collection-filter {
+  @extend .well;
+  .row {
+    @include make-row(10px);
+    @for $i from 1 through $grid-columns {
+      .col-xs-#{$i} {
+        @include make-xs-column($i, 10px);
+      }
+    }
+  }
+}
