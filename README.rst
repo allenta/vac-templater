@@ -17,37 +17,41 @@ name, description, type (e.g. integer, duration, ACL, timestamp, etc.),
 validations (e.g. min, max, regexp, etc.) and user role (i.e. not all users are
 allowed to edit contents of all placeholders).
 
-=======  =============  =============  =============  =============  =========
-|login|  |deployment1|  |deployment2|  |deployment3|  |deployment4|  |history|
-=======  =============  =============  =============  =============  =========
+=======  =============  =============
+|login|  |deployment1|  |deployment2|
+=======  =============  =============
+
+=============  =============  =========
+|deployment3|  |deployment4|  |history|
+=============  =============  =========
 
 .. |login| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/login_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: Login screen
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/login.png
 
 .. |deployment1| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment1_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: VCL deployment (step #1)
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment1.png
 
 .. |deployment2| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment2_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: VCL deployment (step #2)
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment2.png
 
 .. |deployment3| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment3_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: VCL deployment (step #3)
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment3.png
 
 .. |deployment4| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment4_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: VCL deployment (step #4)
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/deployment4.png
 
 .. |history| image:: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/history_small.png
-   :width: 133 px
+   :width: 266 px
    :alt: Past deployments
    :target: https://raw.github.com/allenta/vac-templater/master/extras/screenshots/history.png
 
