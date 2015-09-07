@@ -70,7 +70,8 @@ Prepare the environment
 
     bob:~$ sudo pip install virtualenv
 
-2. Choose an user (e.g. ``www-data``) a location for the VAC Templater environment
+2. Choose an user (e.g. ``www-data``) to run the VAC Templater's server. Also 
+   select a location for the VAC Templater environment
    (e.g. ``/var/lib/virtualenvs/vac-templater``), create and activate it::
 
     bob:~$ sudo mkdir -p /var/lib/virtualenvs
