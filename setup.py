@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 VAC Templater
-=========
+=============
 
 VAC (Varnish Administration Console) Templater is a simple server and web UI
 designed to allow non-technical users to graphically modify and deploy Varnish
