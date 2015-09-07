@@ -3,7 +3,7 @@ designed to allow non-technical users to graphically modify and deploy `Varnish
 Cache <https://www.varnish-cache.org>`_ configurations. VAC Templater depends on
 the `VAC API <https://www.varnish-software.com/product/varnish-administration-console>`_
 to discover VCL files and to execute deployments. **A
-`Varnish Plus <https://www.varnish-software.com/what-is-varnish-plus>` subscription is
+`Varnish Plus <https://www.varnish-software.com/what-is-varnish-plus>`_ subscription is
 required to get access to the VAC.**
 
 VAC Templater is a web UI that extends the current functionality of the VAC. In
