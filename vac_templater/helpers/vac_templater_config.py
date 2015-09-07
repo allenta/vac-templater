@@ -165,7 +165,7 @@ class VACTemplaterConfig(object):
         # were provided.
         for setting in settings:
             if type(setting) == VACTemplaterGroupSetting:
-                self._substitute(values, vcl, setting.settings)
+                vcl = self._substitute(values, vcl, setting.settings)
             elif setting.id in values:
                 vcl = re.sub(
                     r'/\* {{ %s(\|(\w+))? \*/(.*?)/\* }} \*/' % setting.id,
