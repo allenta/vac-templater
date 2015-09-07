@@ -1,0 +1,34 @@
+{% extends "emails/base.email" %}
+{% load i18n %}
+
+{% block subject_content %}{% trans 'VCL deploy notification' %}{% endblock %}
+
+{% block plain_content %}
+  A new VCL has just been deployed!
+
+  Deploy time: {{ deployment.created_at|date:"DATETIME_FORMAT" }}
+  User: {{ deployment.user.username }}
+  Cache group: {{ deployment.group_name }} ({{ deployment.group_oid }})
+  VCL Branch: {{ deployment.branch_name }} ({{ deployment.branch_oid }})
+  Old head: {{ deployment.old_head_oid }}
+  New head: {{ deployment.new_head_oid }}
+
+  {{ deployment.vcl }}
+{% endblock %}
+
+{% block html_content %}
+  {% autoescape on %}
+    <p>A new VCL has just been deployed!</p>
+
+    <dl>
+      <dt>Deploy time</dt><dd>{{ deployment.created_at|date:"DATETIME_FORMAT" }}</dd>
+      <dt>User</dt><dd>{{ deployment.user.username }}</dd>
+      <dt>Cache group</dt><dd>{{ deployment.group_name }} ({{ deployment.group_oid }})</dd>
+      <dt>VCL Branch</dt><dd>{{ deployment.branch_name }} ({{ deployment.branch_oid }})</dd>
+      <dt>Old head</dt><dd>{{ deployment.old_head_oid }}</dd>
+      <dt>New head</dt><dd>{{ deployment.new_head_oid }}</dd>
+    </dl>
+
+    <pre>{{ deployment.vcl }}</pre>
+  {% endautoescape %}
+{% endblock %}

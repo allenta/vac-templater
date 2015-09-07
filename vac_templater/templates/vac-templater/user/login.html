@@ -1,0 +1,42 @@
+{% extends request.is_ajax|yesno:"ajax.html,anonymous.html" %}
+{% load i18n %}
+{% load vac_templater_form_helpers %}
+{% load vac_templater_widget_helpers %}
+
+{% block title %}{% trans 'Login' %}{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="login-form col-xs-10 col-xs-offset-1">
+      <h2>{% trans 'Login' %}</h2>
+      {% form_errors form %}
+      <form action="{% url 'user:login' %}" method="post" class="ajax">
+        {% csrf_token %}
+        {{ form.destination }}
+        <fieldset>
+          {% form_group form.username %}
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+              {{ form.username|add_class:"form-control col-xs-12" }}
+            </div>
+            {% field_errors form.username %}
+          {% endform_group %}
+
+          {% form_group form.password %}
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              {{ form.password|add_class:"form-control col-xs-12" }}
+            </div>
+            {% field_errors form.password %}
+          {% endform_group %}
+
+          <div class="clearfix actions pull-right">
+            <button class="btn btn-primary" type="submit">
+              <i class="glyphicon glyphicon-ok glyphicon-white"></i> {% trans 'Sign in' %}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock %}

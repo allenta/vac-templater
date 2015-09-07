@@ -1,0 +1,14 @@
+VAC Templater developers are:
+
+    - Carlos Abalde <cabalde@allenta.com>
+
+    - David Fuentes <davidfb@allenta.com>
+
+
+VAC Templater is sponsored by Allenta Consulting (http://allenta.com).
+
+    - For general inquiries, please, contact us directly at
+    info@allenta.com.
+
+    - For bug reports and feature suggestions, please, use GitHub's
+    issue tracker at https://github.com/allenta/vac-templater/issues.

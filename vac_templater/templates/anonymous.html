@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load vac_templater_base_helpers %}
+
+{% block layout_name %}anonymous{% endblock %}
+
+{% block layout %}
+  <div class="container">
+    <div class="throbber-global"></div>
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  <footer>
+    <div class="pull-right"><a href="https://github.com/allenta/vac-templater">VAC Templater</a></div>
+  </footer>
+{% endblock %}

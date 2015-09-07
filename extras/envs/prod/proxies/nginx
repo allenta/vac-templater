@@ -1,0 +1,32 @@
+##
+## This sample reverse proxy configuration assumes the following
+## VAC Templater settings:
+##
+##   [global]
+##   base_url: http://vac-templater.domain.com
+##
+##   [uwsgi]
+##   bind: 127.0.0.1:8001
+##
+## VAC Templater virtualenv is assumed to be installed in '/var/lib/virtualenvs/vac-templater'.
+##
+
+server {
+    listen 80;
+    server_name vac-templater.domain.com;
+    charset utf-8;
+
+    client_max_body_size 5m;
+    client_body_buffer_size 128k;
+
+    location /assets/ {
+        add_header Cache-Control 'public, max-age=31104000';
+        add_header Last-Modified 'Sat, 01 Jan 2000 00:00:00 GMT';
+        add_header Expires 'Thu, 31 Dec 2037 23:55:55 GMT';
+        alias /var/lib/virtualenvs/vac-templater/lib/python2.7/site-packages/vac_templater/assets/;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8001;
+    }
+}

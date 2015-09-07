@@ -1,0 +1,100 @@
+/******************************************************************************
+ * User > Login
+ ******************************************************************************/
+
+body.user-login-page {
+  .container {
+    width: 450px;
+  }
+  #content {
+    background-color: #F9F9F9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  }
+  .login-form {
+    h2 {
+      margin-bottom: 20px;
+    }
+    .clearfix.actions {
+      margin-top: 10px;
+    }
+  }
+}
+
+/******************************************************************************
+ * VCL > Deploy
+ ******************************************************************************/
+
+body.vcl-deploy-page,
+body.home-page {
+  .lead {
+    margin-bottom: 30px;
+  }
+  fieldset {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    legend {
+      background-color: #e5e5e5;
+      padding: 10px;
+    }
+    fieldset {
+      padding-left: 25px;
+    }
+  }
+  .form-group {
+    .alert {
+      margin-top: 20px;
+    }
+    &.duration {
+      label {
+        display: block;
+      }
+      input {
+        display: inline-block;
+        width: 80%;
+      }
+      select {
+        display: inline-block;
+        width: 20%;
+      }
+    }
+    &.boolean input[type="checkbox"] {
+      width: 15px;
+      box-shadow: none;
+      display: inline;
+      vertical-align: -13px;
+      margin-left: 10px;
+    }
+  }
+  .repeatable-field .form-control:not(button) {
+    margin-bottom: 5px;
+  }
+}
+
+/******************************************************************************
+ * VCL > Deployment
+ ******************************************************************************/
+
+body.vcl-deployment-page {
+  .changes .value {
+    white-space: pre-wrap;
+  }
+}
+
+/******************************************************************************
+ * VCL > History
+ ******************************************************************************/
+
+body.vcl-history-page {
+  .deployments {
+    td {
+      .group, .created-at {
+        margin-bottom: 5px;
+      }
+    }
+  }
+  .modal-dialog {
+    min-width: 700px;
+  }
+}

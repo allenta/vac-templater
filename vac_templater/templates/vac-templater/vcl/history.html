@@ -1,0 +1,144 @@
+{% extends "vac-templater/vcl/layout.html" %}
+{% load i18n %}
+{% load l10n %}
+{% load media %}
+{% load vac_templater_base_helpers %}
+{% load vac_templater_form_helpers %}
+{% load vac_templater_widget_helpers %}
+{% load humanize %}
+
+{% block title %}{% trans 'VCL' %} > {% trans 'History' %}{% endblock %}
+
+{% block sidebar_section %}history{% endblock %}
+
+{% block sidebar_content %}
+  <div class="page-header">
+    <h1>
+      {% trans 'History' %}
+      <small>{% trans 'Browse past VCL deployments using VAC Templater' %}</small>
+    </h1>
+  </div>
+
+  <div id="breadcrumb">
+    <i class="glyphicon glyphicon-home"></i>
+    <span class="item">{% trans 'VCL' %}</span>
+    <a href="{% url 'vcl:history' %}" class="current">{% trans 'History' %}</a>
+  </div>
+
+  <div class="deployments-browser">
+    <div class="collection-filter">
+      <form action="#" class="row">
+        <div class="col-xs-2">
+          {{ form.group|add_class:"form-control" }}
+        </div>
+        <div class="col-xs-3">
+          {{ form.branch|add_class:"form-control" }}
+        </div>
+        <div class="col-xs-3">
+          {{ form.commit|add_class:"form-control" }}
+        </div>
+        <div class="col-xs-2">
+          {{ form.user|add_class:"form-control" }}
+        </div>
+        <div class="col-xs-2">
+          <button type="submit" class="btn btn-primary col-xs-12">
+            <i class="glyphicon glyphicon-search icon-white"></i>
+            {% trans 'Search' %}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="form-group btn-toolbar pull-right">
+      <div class="btn-group collection-sort">
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-sort"></i> {% trans 'Sort by' %} <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          {% for id, name in form.SORT_CRITERIA_CHOICES %}
+            {% with sort_criteria=form.cleaned_data.sort_criteria sort_direction=form.cleaned_data.sort_direction %}
+              <li data-sort-criteria="{{ id }}" data-sort-direction="{% if id == sort_criteria %}{{ sort_direction }}{% else %}asc{% endif %}" class="{% if id == sort_criteria %}active{% endif %}">
+                <a href="#"><i class="glyphicon {% if id == sort_criteria %}glyphicon-sort-direction-{{ sort_direction }}{% else %}glyphicon-sort-direction-none{% endif %}"></i> {{ name }}</a>
+              </li>
+            {% endwith %}
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="btn-group collection-items-per-page">
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">{% trans 'Items' %} <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          {% for items in form.ITEMS_PER_PAGE_CHOICES %}
+            <li data-collection-items-per-page="{{ items }}" class="{% if items == form.cleaned_data.items_per_page %}active{% endif %}">
+              <a href="#">{{ items }} {% trans 'per page' %}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    {% if form.paginator.current_page.object_list %}
+      <table class="table table-striped deployments">
+        <tbody>
+          {% for deployment in form.paginator.current_page.object_list %}
+            <tr>
+              <td class="id">{{ deployment.id }}</td>
+              <td>
+                <div class="group">
+                  <a href="#" class="filter" data-field="group" data-value="{{ deployment.group_name }}" data-toggle="tooltip" title="{% trans 'Cache group' %}"><i class="glyphicon glyphicon-th"></i> {{ deployment.group_name }}</a>
+                  <a href="#" class="filter" data-field="group" data-value="{{ deployment.group_oid }}" data-toggle="tooltip" title="{{ deployment.group_oid }}">[{{ deployment.group_oid|slice:"8" }}]</a>
+                </div>
+                <div class="branch description">
+                  <a href="#" class="filter" data-field="branch" data-value="{{ deployment.branch_name }}" data-toggle="tooltip" title="{% trans 'VCL branch' %}"><i class="glyphicon glyphicon-tag"></i> {{ deployment.branch_name }}</a>
+                  <a href="#" class="filter" data-field="branch" data-value="{{ deployment.branch_oid }}" data-toggle="tooltip" title="{{ deployment.branch_oid }}">[{{ deployment.branch_oid|slice:"8" }}]</a>
+                </div>
+              </td>
+              <td class="head-oid">
+                <a href="#" class="filter" data-field="commit" data-value="{{ deployment.old_head_oid }}" data-toggle="tooltip" title="{{ deployment.old_head_oid }}">{{ deployment.old_head_oid|slice:"8" }}</a>
+                →
+                <a href="#" class="filter" data-field="commit" data-value="{{ deployment.new_head_oid }}" data-toggle="tooltip" title="{{ deployment.new_head_oid }}">{{ deployment.new_head_oid|slice:"8" }}</a>
+              </td>
+              <td>
+                <div class="created-at description">
+                  <span data-toggle="tooltip" title="{{ deployment.created_at|date:"DATETIME_FORMAT" }}">
+                    <i class="glyphicon glyphicon-time"></i> {% trans 'Deployed' %} {{ deployment.created_at|naturaltime }}
+                  </span>
+                </div>
+                <div class="user description">
+                  <a href="#" class="filter" data-field="user" data-value="{{ deployment.user }}"><i class="glyphicon glyphicon-user"></i> {{ deployment.user }}</a>
+                </div>
+              </td>
+              <td class="vcl">
+                <a href="{% url 'vcl:deployment' deployment_id=deployment.id %}"><i class="glyphicon glyphicon-eye-open" data-toggle="tooltip" title="{% trans 'Detailed view' %}"></i></a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <nav>
+        <div class="collection-pager text-center">
+          <ul class="pagination">
+            <li class="{% if not form.paginator.current_page.has_previous %}disabled{% endif %}" data-page="{% if form.paginator.current_page.has_previous %}{{ form.paginator.current_page.previous_page_number }}{% endif %}">
+              <a href="#">
+                <span>&laquo;</span>
+              </a>
+            </li>
+            {% for page in form.paginator.page_range_slice %}
+              <li data-page="{{ page }}" class="{% if page == form.cleaned_data.page %}active{% endif %}"><a href="#">{{ page }}</a></li>
+            {% endfor %}
+            <li class="{% if not form.paginator.current_page.has_next %}disabled{% endif %}" data-page="{% if form.paginator.current_page.has_next %}{{ form.paginator.current_page.next_page_number }}{% endif %}">
+              <a href="#">
+                <span>&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    {% endif %}
+  </div>
+
+  <script type="text/javascript">
+    vac_templater.partials.ready('vcl-history-page', {
+      browse_url: '{% url 'vcl:history' %}'
+    });
+  </script>
+{% endblock %}

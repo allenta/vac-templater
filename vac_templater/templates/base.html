@@ -1,0 +1,57 @@
+{% spaceless %}
+  {% load i18n %}
+  {% load media %}
+  {% load vac_templater_base_helpers %}
+
+  {% capture layout_name %}{% block layout_name %}authenticated{% endblock %}{% endcapture %}
+
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html itemscope itemtype="http://schema.org/" xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ LANGUAGE_CODE }}">
+{% endspaceless %}
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link rel="shortcut icon" type="image/x-icon" href="{% media_url "favicon.ico" %}"/>
+  <title>VAC Templater > {% block title %}{% endblock %}</title>
+  {% include_media 'default-bundle.css' %}
+  <script type="text/javascript">
+    var vac_templater = vac_templater || {
+      csrf_token: '{{ csrf_token }}',
+      layout: '{{ layout_name }}',
+      page_id: '{{ page_id }}',
+      language: '{{ LANGUAGE_CODE }}',
+      timezone: '{{ TIME_ZONE }}',
+      https: {% settings_value 'HTTPS_ENABLED' 'json' %},
+      version: {% settings_value 'VERSION' 'json' %},
+      is_production: {% settings_value 'IS_PRODUCTION' 'json' %}
+    };
+  </script>
+  {% include_media 'default-bootstrap.js' language=LANGUAGE_CODE %}
+</head>
+<body class="{{ page_id }}-page {{ layout_name }}-layout {{ LANGUAGE_CODE }}-lng">
+  {% block layout %}{% endblock %}
+  <div id="overlay"></div>
+  <div id="floating-notifications-container" style="display: none">
+    <div id="default-template">
+      <div class="notification floating-notification #{type}">
+        <div class="ui-notify-contents-top"></div>
+        <div class="ui-notify-contents-wrapper">
+          <div class="ui-notify-contents">
+            <a class="close ui-notify-close" href="#">&times;</a>
+            <p>#{text}</p>
+          </div>
+        </div>
+        <div class="ui-notify-contents-bottom"></div>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    (function ($) {
+      vac_templater.ready(function(context) {
+        vac_templater.commands.notify({{ messages|safe }});
+      });
+    })(jQuery);
+  </script>
+</body>
+</html>

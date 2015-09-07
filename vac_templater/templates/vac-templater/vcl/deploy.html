@@ -1,0 +1,110 @@
+{% extends "vac-templater/vcl/layout.html" %}
+{% load i18n %}
+{% load vac_templater_base_helpers %}
+{% load vac_templater_widget_helpers %}
+
+{% block title %}{% trans 'VCL' %} > {% trans 'Deploy' %}{% endblock %}
+
+{% block sidebar_section %}deploy{% endblock %}
+
+{% block sidebar_content %}
+  {% capture vac_url %}{% settings_value 'VAC_LOCATION' %}{% endcapture %}
+
+  <div class="page-header">
+    <h1>
+      {% trans 'Deploy' %}
+      <small>{% trans 'Execute a new VCL deployment' %}</small>
+    </h1>
+  </div>
+
+  <div id="breadcrumb">
+    <i class="glyphicon glyphicon-home"></i>
+    <span class="item">{% trans 'VCL' %}</span>
+    <a href="{% url 'vcl:deploy' %}" class="current">{% trans 'Deploy' %}</a>
+  </div>
+
+  <form method="POST" class="ajax">
+    {% csrf_token %}
+
+    {% if cache_group_form %}
+      <div id="choose-group" class="well">
+        <p class="lead">{% trans '1. Choose a cache group...' %}</p>
+        <div class="row">
+          <div class="form-group col-xs-11">
+            {{ cache_group_form.group|add_class:"form-control" }}
+          </div>
+          <div class="form-group col-xs-1">
+            <button type="submit" name="op" value="choose-group" class="btn btn-primary btn-block">
+              <i class="glyphicon glyphicon-chevron-right"></i>&nbsp;
+            </button>
+          </div>
+        </div>
+        {% for error in cache_group_form.group.errors %}
+          <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign"></span>
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if deploy_form %}
+      <div id="modify-settings" class="well">
+        <p class="lead">{% trans '2. Modify any settings you want...' %}</p>
+        {% if deploy_form.vcl_commit %}
+          {% if deploy_form.config %}
+            {% if deploy_form.visible_fields %}
+              {% for field in deploy_form.hidden_fields %}
+                {{ field }}
+              {% endfor %}
+
+              {% for setting in deploy_form.config.settings %}
+                {% include 'vac-templater/vcl/_setting.html' with setting=setting form=deploy_form only %}
+              {% endfor %}
+
+              <div class="row">
+                <div class="col-xs-12">
+                  <button type="submit" name="op" value="deploy" class="pull-right btn btn-primary">
+                    <i class="glyphicon glyphicon-upload"></i> {% trans 'Deploy!' %}
+                  </button>
+                </div>
+              </div>
+            {% else %}
+              <p>
+                {% blocktrans %}
+                  There are no settings to edit in this VCL. Use the <a href="{{ vac_url }}">VAC</a>
+                  to edit it and add some custom VAC Templater configuration.
+                {% endblocktrans %}
+              </p>
+            {% endif %}
+          {% else %}
+            <ul class="list-group">
+              {% for error in deploy_form.config_errors %}
+                <li class="list-group-item list-group-item-danger">
+                  <i class="glyphicon glyphicon-exclamation-sign"></i> {{ error }}
+                </li>
+              {% endfor %}
+            </ul>
+            <p>
+              {% blocktrans %}
+                Fix these errors on the VAC Templater configuration at the currently loaded
+                VCL by using the <a href="{{ vac_url }}">VAC</a>.
+              {% endblocktrans %}
+            </p>
+          {% endif %}
+        {% else %}
+          <p>
+            {% blocktrans %}
+              This cache group has no associated VCL. Use the <a href="{{ vac_url }}">VAC</a>
+              to load one.
+            {% endblocktrans %}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </form>
+
+  <script type="text/javascript">
+    vac_templater.partials.ready('vcl-deploy-page', {});
+  </script>
+{% endblock %}

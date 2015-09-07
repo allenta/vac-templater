@@ -1,0 +1,9 @@
+<script type="text/javascript">
+(function ($) {
+  vac_templater.ready(function() {
+    $(document).attr('title', 'VAC Templater > {% block title %}{% endblock %}');
+  });
+})(jQuery);
+</script>
+
+{% block content %}{% endblock %}

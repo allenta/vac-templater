@@ -1,0 +1,7 @@
+include *.txt
+include *.rst
+recursive-include vac_templater/assets *
+recursive-include vac_templater/templates *
+recursive-include vac_templater/locale *
+global-exclude *~
+global-exclude .DS_Store

@@ -1,0 +1,28 @@
+{% load i18n %}
+{% load vac_templater_base_helpers %}
+{% load vac_templater_form_helpers %}
+{% load vac_templater_widget_helpers %}
+
+{% if setting.id in form.fieldsets %}
+  {% with fieldset=form.fieldsets|key:setting.id %}
+    <fieldset>
+      <legend>{{ fieldset.legend }}</legend>
+      {% if fieldset.description %}
+        <p class="fieldset-description">{{ fieldset.description }}</p>
+      {% endif %}
+      {% for subsetting in fieldset.subsettings %}
+        {% include 'vac-templater/vcl/_setting.html' with setting=subsetting form=form only %}
+      {% endfor %}
+    </fieldset>
+  {% endwith %}
+{% elif setting.id in form.fields %}
+  {% with field=form|key:setting.id %}
+    {% capture setting_type %}{{ setting.TYPE }}{% endcapture %}
+    {% form_group field setting_type %}
+      {% field_label field %}
+      {{ field|add_class:"form-control" }}
+      {% field_help field %}
+      {% field_errors field %}
+    {% endform_group %}
+  {% endwith %}
+{% endif %}

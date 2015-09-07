@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load media %}
+{% load vac_templater_base_helpers %}
+
+{% block layout_name %}authenticated{% endblock %}
+
+{% block layout %}
+  <div id="navbar">
+    <div id="primary-navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <a href="{% url 'home' %}" class="navbar-brand"></a>
+
+        <ul class="nav navbar-nav">
+          <li class="{% active request "^(/vcl/|/home/)" %}">
+            <a href="{% url 'home' %}">{% trans 'VCL' %}</a>
+          </li>
+          <li>
+            <a href="{% settings_value 'VAC_LOCATION' %}">{% trans 'VAC' %}</a>
+          </li>
+          <li>
+            <a href="https://www.varnish-software.com/what-is-varnish-plus">{% trans 'About Varnish Plus' %}</a>
+          </li>
+        </ul>
+
+        <div class="btn-group navbar-right">
+          <button type="button" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown">
+            <i class="glyphicon glyphicon-user"></i>
+            {{ request.user.username|slice:'30' }}{% if request.user.username|length > 30 %}...{% endif %}
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'user:logout' %}"><i class="glyphicon glyphicon-off"></i> {% trans 'Disconnect' %}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="throbber-global"></div>
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}

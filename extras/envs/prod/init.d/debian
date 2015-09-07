@@ -1,0 +1,96 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          vac-templater
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Should-Start:      $local_fs
+# Should-Stop:       $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: VAC Templater
+### END INIT INFO
+
+VAC_TEMPLATER_VIRTUALENV="/var/lib/virtualenvs/vac-templater"
+VAC_TEMPLATER_USER=www-data
+VAC_TEMPLATER_GROUP=www-data
+VAC_TEMPLATER_NAME=vac-templater
+VAC_TEMPLATER_DAEMON=$VAC_TEMPLATER_VIRTUALENV/bin/vac-templater
+VAC_TEMPLATER_PID_FILE=/var/run/vac-templater/$VAC_TEMPLATER_NAME.pid
+
+. /lib/lsb/init-functions
+
+[ -x $VAC_TEMPLATER_DAEMON ] || exit 0
+
+. "$VAC_TEMPLATER_VIRTUALENV/bin/activate"
+
+mkdir -p -m0755 /var/run/vac-templater/
+chown $VAC_TEMPLATER_USER:$VAC_TEMPLATER_GROUP /var/run/vac-templater/
+
+vac_templater_start () {
+    log_daemon_msg "Starting" $VAC_TEMPLATER_NAME
+    OUTPUT=$(/bin/tempfile -s.$VAC_TEMPLATER_NAME)
+    if start-stop-daemon \
+            --start --quiet --umask 007 --chuid $VAC_TEMPLATER_USER \
+            --pidfile $VAC_TEMPLATER_PID_FILE \
+            --exec $VAC_TEMPLATER_DAEMON start -- > $OUTPUT 2>&1; then
+        log_end_msg 0
+    else
+        log_end_msg 1
+        cat $OUTPUT
+        exit 1
+    fi
+    rm $OUTPUT
+}
+
+vac_templater_stop () {
+    log_daemon_msg "Stopping" $VAC_TEMPLATER_NAME
+    if start-stop-daemon \
+            --stop --quiet \
+            --pidfile $VAC_TEMPLATER_PID_FILE --retry 10; then
+        log_end_msg 0
+    else
+        log_end_msg 1
+    fi
+}
+
+vac_templater_restart () {
+    vac_templater_stop
+    vac_templater_start
+}
+
+vac_templater_status () {
+    status_of_proc \
+        -p $VAC_TEMPLATER_PID_FILE \
+        $VAC_TEMPLATER_DAEMON $VAC_TEMPLATER_NAME && exit 0 || exit $?
+}
+
+case "$1" in
+    start)
+        vac_templater_start
+    ;;
+
+    stop)
+        vac_templater_stop
+    ;;
+
+    restart)
+        vac_templater_restart
+    ;;
+
+    status)
+        vac_templater_status
+    ;;
+
+    reload|force-reload)
+        echo "Use restart" 1>&2
+        exit 1
+    ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|status}" 1>&2
+        exit 2
+    ;;
+esac
+
+exit 0

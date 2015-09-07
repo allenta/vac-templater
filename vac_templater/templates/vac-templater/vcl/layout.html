@@ -1,0 +1,42 @@
+{% extends request.is_ajax|yesno:"ajax.html,authenticated.html" %}
+{% load i18n %}
+{% load vac_templater_base_helpers %}
+
+{% block content %}
+  {% capture section %}{% block sidebar_section %}{% endblock %}{% endcapture %}
+  <div class="with-sidebar">
+    <div class="sidebar">
+      <ul class="nav nav-tabs nav-stacked">
+        <!-- Deploy -->
+        <li class="{% active section "^deploy$" %}">
+          <a href="{% url 'vcl:deploy' %}">
+            <i class="glyphicon glyphicon-cog"></i>
+            <div class="title">{% trans 'Deploy' %}</div>
+          </a>
+        </li>
+        <!-- History -->
+        <li class="{% active section "^history$" %}">
+          <a href="{% url 'vcl:history' %}">
+            <i class="glyphicon glyphicon-cog"></i>
+            <div class="title">{% trans 'History' %}</div>
+          </a>
+        </li>
+        <!-- More -->
+        <li class="more" style="display: none;">
+          <a href="#">
+            <i class="glyphicon glyphicon-th-large"></i>
+            <div class="title">{% trans 'More' %}</div>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="container">
+      <div class="inner-container">
+        {% block sidebar_content %}{% endblock %}
+        <footer>
+          <div class="pull-right"><a href="https://github.com/allenta/vac-templater">VAC Templater</a></div>
+        </footer>
+      </div>
+    </div>
+  </div>
+{% endblock %}
