@@ -132,7 +132,7 @@ Upgrade
 
 Simply execute in a terminal with the proper active virtualenv::
 
-  (vac-templater)bob:~$ sudo sh -c '. /var/lib/virtualenvs/vac-templater/bin/activate; pip install --upgrade vac-templater'
+  $ sudo sh -c '. /var/lib/virtualenvs/vac-templater/bin/activate; pip install --upgrade vac-templater'
 
 VAC Templater transparently supports migrations by using Django's own migration
 mechanism so you don't need to do anything special to keep the database up to date.
