@@ -80,7 +80,7 @@ Install, configure & test
 -------------------------
 
 Follow next steps running all commands in a terminal with the newly
-created virtualenv active (i.e. `source /var/lib/virtualenvs/vac-templater/bin/activate`).
+created virtualenv active (i.e. ``source /var/lib/virtualenvs/vac-templater/bin/activate``).
 
 1. Install VAC Templater and all its dependencies::
 
@@ -95,8 +95,8 @@ created virtualenv active (i.e. `source /var/lib/virtualenvs/vac-templater/bin/a
 
     (vac-templater)bob:~$ vac-templater settings | sudo tee /etc/vac-templater.conf
 
-   Beware the default configuration assumes some folders (`/var/run/vac-templater/`,
-   `/var/log/vac-templater/` and `/var/lib/vac-templater/`) exists and are
+   Beware the default configuration assumes some folders (``/var/run/vac-templater/``,
+   ``/var/log/vac-templater/`` and ``/var/lib/vac-templater/``) exists and are
    writable by the user (e.g. ``www-data``) running the VAC Templater's server::
 
     (vac-templater)bob:~$ sudo mkdir -p -m0755 /var/run/vac-templater/ /var/log/vac-templater/ /var/lib/vac-templater/
