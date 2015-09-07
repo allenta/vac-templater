@@ -8,15 +8,13 @@ environment.
 - A Varnish Plus license is required to setup the development environment. The
   Vagrantfile of the project assumes the following environment variables are
   defined:
-    - ``VARNISH_PLUS_USER``, including the username of your Varnish Plus
-      license.
-    - ``VARNISH_PLUS_PASSWORD``, including the password if your Varnish Plus
-      license.
-    - ``VARNISH_PLUS_VAC_LICENSE``, including the location of your Varnish
-      Administration Console license.
+  
+  * ``VARNISH_PLUS_USER``, including the username of your Varnish Plus license.
+  * ``VARNISH_PLUS_PASSWORD``, including the password if your Varnish Plus license.
+  * ``VARNISH_PLUS_VAC_LICENSE``, including the location of your Varnish Administration Console license.
 
 - Set ``global > development`` to ``true`` and ``uwsgi > daemonize`` to
-  ``false``in your personal configuration
+  ``false`` in your personal configuration
   (``/vagrant/extras/envs/dev/vac-templater.conf``).
 
 - Initialize database schema::
