@@ -108,7 +108,7 @@ created virtualenv active (i.e. ``source /var/lib/virtualenvs/vac-templater/bin/
    ``VAC_TEMPLATER_CONF`` environment variable to set its location).
    Lauch it using the following command::
 
-    (vac-templater)bob:~$ sudo -u www-data sh -c '. /var/lib/virtualenvs/vac-templater/bin/activate; vac-templater status'
+    (vac-templater)bob:~$ sudo -u www-data sh -c '. /var/lib/virtualenvs/vac-templater/bin/activate; vac-templater start'
 
 5. If not changed in the configuration, the VAC Templater's server runs on port 8001.
    If locally installed, you should now be able to test the service by
