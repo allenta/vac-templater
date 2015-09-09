@@ -219,7 +219,10 @@ class DeployForm(forms.Form):
                 try:
                     setting.validate(value)
                     field = self.fields[setting.id]
-                    if field.has_changed(field.initial, value):
+                    prefixed_name = self.add_prefix(setting.id)
+                    data_value = field.widget.value_from_datadict(
+                        self.data, self.files, prefixed_name)
+                    if field.has_changed(field.initial, data_value):
                         self.changes.append(
                             (setting.name,
                              setting.to_vcl(field.initial),

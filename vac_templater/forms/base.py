@@ -88,14 +88,17 @@ class RepeatableField(MultiValueField):
                 data, files, name)
 
         def decompress(self, value):
-            return value
+            # Make sure there's a value for every current widget.
+            if value:
+                return value + [u''] * (len(self.widgets) - len(value))
+            return []
 
     def __init__(self, reference_field, *args, **kwargs):
         self.reference_field = reference_field
         kwargs['initial'] = kwargs.get('initial') or []
         # Build enough fields to cover the initial values plus one for allowing
         # a new value to be added.
-        fields = [reference_field] * (len(kwargs.get('initial') or []) + 1)
+        fields = [reference_field] * (len(kwargs['initial']) + 1)
         super(RepeatableField, self).__init__(
             fields=fields,
             require_all_fields=False,
@@ -108,7 +111,8 @@ class RepeatableField(MultiValueField):
     def clean(self, value):
         if isinstance(value, (list, tuple)):
             # Rebuild fields to adapt to the number of values that have been
-            # sent (it could have changed if new fields were created with JS).
+            # sent (it could have been changed if new fields were created with
+            # JS).
             self.fields = [self.reference_field] * len(value)
         return super(RepeatableField, self).clean(value)
 
@@ -118,6 +122,7 @@ class RepeatableField(MultiValueField):
 
     def has_changed(self, initial, data):
         # Take into account the case when the number of subfields has changed.
+        initial = self.widget.decompress(initial)
         return \
             (isinstance(initial, list) and
              isinstance(data, list) and
