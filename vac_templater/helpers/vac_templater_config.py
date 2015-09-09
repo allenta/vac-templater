@@ -6,8 +6,11 @@
 '''
 
 from __future__ import absolute_import
+import pytz
 import re
+import time
 import yaml
+from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
@@ -829,6 +832,117 @@ class VACTemplaterBooleanSetting(VACTemplaterSetting):
 
         # No conversion done? Fail.
         raise ValueError()
+
+
+class VACTemplaterTimeSetting(VACTemplaterSetting):
+    TYPE = 'time'
+    REPRESENTATIONS = ('real', 'str')
+
+    @classmethod
+    def to_vcl(cls, value, representation=None):
+        # Default representation is "real".
+        representation = representation or 'real'
+
+        # Convert!
+        if isinstance(value, datetime):
+            if representation == 'real':
+                return '%.2f' % time.mktime(value.timetuple())
+            elif representation == 'str':
+                return '"%.2f"' % time.mktime(value.timetuple())
+        elif value is None:
+            if representation == 'real':
+                return '0.00'
+            else:
+                return '"0.00"'
+
+        # No conversion done? Fail.
+        raise ValueError()
+
+    @classmethod
+    def to_python(cls, raw_value, representation=None):
+        # Default representation is "real".
+        representation = representation or 'real'
+
+        # Convert!
+        if representation == 'real':
+            # 0.00 gets transformed into None.
+            if float(raw_value):
+                try:
+
+                    return datetime.fromtimestamp(
+                        float(raw_value), tz=pytz.utc)
+                except (OverflowError, OSError):
+                    pass
+            else:
+                return None
+        elif representation == 'str' and \
+                raw_value[0] == raw_value[-1] == '"':
+            # 0.00 gets transformed into None.
+            if float(raw_value[1:-1]):
+                try:
+                    return datetime.fromtimestamp(
+                        float(raw_value[1:-1]), tz=pytz.utc)
+                except (OverflowError, OSError):
+                    pass
+            else:
+                return None
+
+        # No conversion done? Fail.
+        raise ValueError()
+
+    @classmethod
+    def _build_validator(cls, id, validator, value):
+        if validator in ('min', 'max'):
+            if isinstance(value, (int, float)):
+                try:
+                    return datetime.fromtimestamp(float(value), tz=pytz.utc)
+                except (OverflowError, OSError):
+                    raise VACTemplaterConfig.ConfigError([
+                        _('"%(validator)s" validator for setting '
+                          '"%(setting)s" should be a valid UNIX '
+                          'timestamp.') % {
+                            'validator': validator,
+                            'setting': id,
+                        }])
+            else:
+                raise VACTemplaterConfig.ConfigError([
+                    _('"%(validator)s" validator for setting "%(setting)s" '
+                      'should be a valid UNIX timestamp.') % {
+                        'validator': validator,
+                        'setting': id,
+                    }])
+        else:
+            return super(VACTemplaterTimeSetting, cls)._build_validator(
+                id, validator, value)
+
+    def validate(self, value):
+        errors = []
+
+        try:
+            super(VACTemplaterTimeSetting, self).validate(value)
+        except ValidationError as e:
+            errors += e.messages
+
+        if 'min' in self.validators and \
+           value is not None and \
+           value < self.validators['min']:
+            errors.append(
+                _('That\'s too soon. Earliest valid date is %(min)s.') % {
+                    'min': str(self.validators['min']),
+                }
+            )
+
+        if 'max' in self.validators and \
+           value is not None and \
+           value > self.validators['max']:
+            errors.append(
+                _('That\'s too late. Latest valid date is %(max)s.') % {
+                    'max': str(self.validators['max']),
+                }
+            )
+
+        if errors:
+            raise ValidationError(errors)
 
 
 class VACTemplaterACL(object):

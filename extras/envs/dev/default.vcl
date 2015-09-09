@@ -21,8 +21,8 @@ vcl 4.0;
  *   # an optional list of validators.
  *   #
  *   # Type may be one of 'text', 'longtext', 'integer', 'duration', 'boolean'
- *   # 'acl', 'select' or 'group' and each one accepts different kinds of
- *   # validators.
+ *   # 'time', 'acl', 'select' or 'group' and each one accepts different kinds
+ *   # of validators.
  *   #
  *   # Settings can also be restricted to a particular role (only users with
  *   # that particular role will be able to modify that setting). All settings
@@ -107,6 +107,21 @@ vcl 4.0;
  *                   - cache-all
  *                   - maintenance
  *
+ *           # 'time' settings accept the following validators: min and max,
+ *           # both expressed as UNIX timestamps. Times always are converted to
+ *           # a UNIX timestamp when they are included in VCL, but there are
+ *           # two ways of representing them: as a real (real, default), or as
+ *           # a string (str).
+ *           - start:
+ *               name: Start
+ *               description: >
+ *                   Delay the start of the currently selected mode by
+ *                   selecting a date and time. Normal mode will remain active
+ *                   until that date. Leave blank to apply changes immediately.
+ *               type: time
+ *               validators:
+ *                 max: 1577836800
+ *
  *           # 'duration' settings accept the following validators: min and max.
  *           - cache-all-ttl:
  *               name: Cache-all mode TTL
@@ -149,6 +164,7 @@ backend default {
 sub vcl_init {
     # Set mode.
     var.global_set("mode", /* {{ modes:mode */"normal"/* }} */);
+    var.global_set("mode-start", /* {{ modes:start|str */"0.0"/* }} */);
 
     # Enable/disable debugging.
     var.global_set("debug", /* {{ debug|str */"0"/* }} */);
@@ -156,7 +172,8 @@ sub vcl_init {
 
 sub vcl_recv {
     # Maintenance mode?
-    if (var.global_get("mode") == "maintenance") {
+    if ((var.global_get("mode") == "maintenance") &&
+        (std.real2time(std.real(var.global_get("mode-start"), 0.0)) < now)) {
         return (synth(700, "Maintenance mode"));
     }
 
@@ -238,7 +255,8 @@ sub vcl_backend_response {
     }
 
     # Cache-all mode?
-    if (var.global_get("mode") == "cache-all") {
+    if ((var.global_get("mode") == "cache-all") &&
+        (std.real2time(std.real(var.global_get("mode-start"), 0.0)) < now)) {
         # Cache everything ignoring any cache headers.
         set beresp.ttl = /* {{ modes:cache-all-ttl */5m/* }} */;
     }
