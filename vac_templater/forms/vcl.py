@@ -15,50 +15,11 @@ from vac_templater.forms.base import SortDirectionField, RepeatableField
 from vac_templater.helpers.vac_templater_config import (
     VACTemplaterConfig, VACTemplaterUser, VACTemplaterTextSetting,
     VACTemplaterLongTextSetting, VACTemplaterIntegerSetting,
-    VACTemplaterDurationSetting, VACTemplaterBooleanSetting,
-    VACTemplaterACLSetting, VACTemplaterSelectSetting,
-    VACTemplaterGroupSetting)
+    VACTemplaterDurationSetting, VACTemplaterDuration,
+    VACTemplaterBooleanSetting, VACTemplaterACLSetting, VACTemplaterACL,
+    VACTemplaterSelectSetting, VACTemplaterGroupSetting)
 from vac_templater.helpers.paginator import Paginator
 from vac_templater.models import Deployment
-
-
-class ACLField(RepeatableField):
-    def __init__(self, *args, **kwargs):
-        reference_field = forms.CharField(required=False)
-        super(ACLField, self).__init__(reference_field, *args, **kwargs)
-
-
-class DurationField(forms.MultiValueField):
-    class Widget(forms.MultiWidget):
-        def __init__(self, *args, **kwargs):
-            super(DurationField.Widget, self).__init__(*args, **kwargs)
-
-        def decompress(self, value):
-            if value:
-                return list(value)
-            return [None, None]
-
-    def __init__(self, *args, **kwargs):
-        intfield = forms.FloatField(required=True, min_value=0)
-        durfield = forms.ChoiceField(required=True, choices=[
-            (duration, VACTemplaterDurationSetting.DURATIONS[duration]['label'])
-            for duration in sorted(
-                VACTemplaterDurationSetting.DURATIONS.keys(),
-                key=lambda duration: VACTemplaterDurationSetting.DURATIONS[duration]['ms'])])
-        super(DurationField, self).__init__(
-            fields=(
-                intfield,
-                durfield,
-            ),
-            require_all_fields=False,
-            widget=DurationField.Widget(widgets=(
-                intfield.widget,
-                durfield.widget,
-            )),
-            *args, **kwargs)
-
-    def compress(self, data_list):
-        return tuple(data_list)
 
 
 class CacheGroupForm(forms.Form):
@@ -78,6 +39,62 @@ class CacheGroupForm(forms.Form):
         return next(
             group for group in self._groups
             if group.id == self.cleaned_data['group'])
+
+
+class ACLField(forms.MultiValueField):
+    class Widget(forms.MultiWidget):
+        def decompress(self, value):
+            if value:
+                return [value.acls]
+            return [[]]
+
+    def __init__(self, *args, **kwargs):
+        field = RepeatableField(
+            forms.CharField(required=False),
+            initial=kwargs['initial'].acls if 'initial' in kwargs else [])
+        super(ACLField, self).__init__(
+            fields=(
+                field,
+            ),
+            require_all_fields=False,
+            widget=ACLField.Widget(widgets=(
+                field.widget,
+            )),
+            *args, **kwargs)
+
+    def compress(self, data_list):
+        return VACTemplaterACL(data_list[0])
+
+
+class DurationField(forms.MultiValueField):
+    class Widget(forms.MultiWidget):
+        def decompress(self, value):
+            if value:
+                return [value.amount, value.granularity]
+            return [None, None]
+
+    def __init__(self, *args, **kwargs):
+        amount_field = forms.FloatField(
+            required=True, min_value=0, localize=True)
+        granularity_field = forms.ChoiceField(required=True, choices=[
+            (granularity, VACTemplaterDurationSetting.GRANULARITIES[granularity]['label'])
+            for granularity in sorted(
+                VACTemplaterDurationSetting.GRANULARITIES.keys(),
+                key=lambda granularity: VACTemplaterDurationSetting.GRANULARITIES[granularity]['ms'])])
+        super(DurationField, self).__init__(
+            fields=(
+                amount_field,
+                granularity_field,
+            ),
+            require_all_fields=False,
+            widget=DurationField.Widget(widgets=(
+                amount_field.widget,
+                granularity_field.widget,
+            )),
+            *args, **kwargs)
+
+    def compress(self, data_list):
+        return VACTemplaterDuration(data_list[0], data_list[1])
 
 
 class DeployForm(forms.Form):
@@ -225,8 +242,8 @@ class DeployForm(forms.Form):
                     if field.has_changed(field.initial, data_value):
                         self.changes.append(
                             (setting.name,
-                             setting.to_vcl(field.initial),
-                             setting.to_vcl(value)))
+                             field.initial,
+                             value))
                 except ValidationError as e:
                     for error in e.messages:
                         self.add_error(

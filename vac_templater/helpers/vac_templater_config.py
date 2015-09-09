@@ -16,7 +16,8 @@ class VACTemplaterConfig(object):
     class ConfigError(Exception):
         def __init__(self, messages, *args, **kwargs):
             self.messages = messages
-            super(VACTemplaterConfig.ConfigError, self).__init__(*args, **kwargs)
+            super(VACTemplaterConfig.ConfigError, self).__init__(
+                *args, **kwargs)
 
     def __init__(self, users=None, settings=None):
         self.users = users or []
@@ -290,7 +291,8 @@ class VACTemplaterSetting(object):
                 type_id = setting_config.values()[0]['type']
                 try:
                     type = next(
-                        (subclass for subclass in VACTemplaterSetting.subclasses()
+                        (subclass
+                         for subclass in VACTemplaterSetting.subclasses()
                          if subclass.TYPE == type_id))
                 except StopIteration:
                     errors.append(
@@ -450,7 +452,8 @@ class VACTemplaterSetting(object):
         The processed value to be used as the specification of the validator is
         returned if both the value and the validator are valid.
         A VACTemplaterConfig.ConfigError exception is raised if any error is
-        found. Subclasses should redefine this method to support their own validators.
+        found. Subclasses should redefine this method to support their own
+        validators.
 
         '''
         # By default, no validator is expected.
@@ -659,9 +662,21 @@ class VACTemplaterIntegerSetting(VACTemplaterSetting):
             raise ValidationError(errors)
 
 
+class VACTemplaterDuration(object):
+    def __init__(self, amount, granularity):
+        self.amount = amount
+        self.granularity = granularity
+
+    def __repr__(self):
+        return "%s %s" % (
+            str(self.amount if (self.amount % 1 > 0) else int(self.amount)),
+            VACTemplaterDurationSetting.GRANULARITIES[self.granularity]['label'],
+        )
+
+
 class VACTemplaterDurationSetting(VACTemplaterSetting):
     TYPE = 'duration'
-    DURATIONS = {
+    GRANULARITIES = {
         'ms': {
             'label': _('milliseconds'),
             'ms': 1,
@@ -694,14 +709,11 @@ class VACTemplaterDurationSetting(VACTemplaterSetting):
         representation = representation or 'duration'
 
         # Convert!
-        if isinstance(value, tuple) and \
-           len(value) == 2 and \
-           isinstance(value[0], float) and \
-           isinstance(value[1], basestring):
+        if isinstance(value, VACTemplaterDuration):
             if representation == 'duration':
                 return "%s%s" % (
-                    str(value[0] if (value[0] % 1 > 0) else int(value[0])),
-                    value[1],
+                    str(value.amount if (value.amount % 1 > 0) else int(value.amount)),
+                    value.granularity,
                 )
 
         # No conversion done? Fail.
@@ -715,9 +727,11 @@ class VACTemplaterDurationSetting(VACTemplaterSetting):
         # Convert!
         if representation == 'duration':
             match = re.match(
-                r'^([0-9]*\.?[0-9]+)(%s)$' % '|'.join(cls.DURATIONS.keys()), raw_value)
+                r'^([0-9]*\.?[0-9]+)(%s)$' % '|'.join(cls.GRANULARITIES.keys()),
+                raw_value)
             if match is not None:
-                return (float(match.group(1)), match.group(2))
+                return VACTemplaterDuration(
+                    float(match.group(1)), match.group(2))
 
         # No conversion done? Fail.
         raise ValueError()
@@ -755,19 +769,19 @@ class VACTemplaterDurationSetting(VACTemplaterSetting):
         except ValidationError as e:
             errors += e.messages
 
-        if value[0] < 0:
+        if value.amount < 0:
             errors.append(_('Duration must be positive.'))
 
-        value_in_milliseconds = value[0] * self.DURATIONS[value[1]]['ms']
+        value_in_milliseconds = value.amount * self.GRANULARITIES[value.granularity]['ms']
 
         if 'min' in self.validators and \
-           value_in_milliseconds < self.validators['min'][0] * self.DURATIONS[self.validators['min'][1]]['ms']:
+           value_in_milliseconds < self.validators['min'].amount * self.GRANULARITIES[self.validators['min'].granularity]['ms']:
             errors.append(_('Value is too small. Minimum is %(min)s.') % {
                 'min': self.to_vcl(self.validators['min']),
             })
 
         if 'max' in self.validators and \
-           value_in_milliseconds > self.validators['max'][0] * self.DURATIONS[self.validators['max'][1]]['ms']:
+           value_in_milliseconds > self.validators['max'].amount * self.GRANULARITIES[self.validators['max'].granularity]['ms']:
             errors.append(_('Value is too big. Maximum is %(max)s.') % {
                 'max': self.to_vcl(self.validators['max']),
             })
@@ -817,16 +831,23 @@ class VACTemplaterBooleanSetting(VACTemplaterSetting):
         raise ValueError()
 
 
+class VACTemplaterACL(object):
+    def __init__(self, acls):
+        self.acls = acls
+
+    def __repr__(self):
+        return '\n'.join(self.acls)
+
+
 class VACTemplaterACLSetting(VACTemplaterSetting):
     TYPE = 'acl'
 
     @classmethod
     def to_vcl(cls, value, representation=None):
         # Convert!
-        if isinstance(value, list) and \
-           all(isinstance(val, basestring) for val in value):
+        if isinstance(value, VACTemplaterACL):
             if representation is None:
-                return '\n' + '\n'.join('%s;' % val for val in value) + '\n'
+                return '\n%s\n' % '\n'.join('%s;' % val for val in value.acls)
 
         # No conversion done? Fail.
         raise ValueError()
@@ -835,7 +856,8 @@ class VACTemplaterACLSetting(VACTemplaterSetting):
     def to_python(cls, raw_value, representation=None):
         # Convert!
         if representation is None:
-            return [value.strip() for value in raw_value.split(';')[:-1]]
+            return VACTemplaterACL([
+                value.strip() for value in raw_value.split(';')[:-1]])
 
         # No conversion done? Fail.
         raise ValueError()
@@ -848,7 +870,7 @@ class VACTemplaterACLSetting(VACTemplaterSetting):
         except ValidationError as e:
             errors += e.messages
 
-        for val in value:
+        for val in value.acls:
             if not re.match(r'^\s*\!?\s*"[^"]+"(\/\d+)?\s*$', val) and \
                not re.match(r'^\s*\(\!?\s*"[^"]+"(\/\d+)?\)\s*$', val):
                 errors.append(_('Invalid value: %(val)s.') % {

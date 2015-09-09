@@ -72,8 +72,8 @@
         {% for setting, from, to in deployment.changes %}
           <tr>
             <td>{{ setting }}</td>
-            <td class="value">{{ from.strip }}</td>
-            <td class="value">{{ to.strip }}</td>
+            <td class="value">{% if from != None %}{{ from }}{% endif %}</td>
+            <td class="value">{% if to != None %}{{ to }}{% endif %}</td>
           </tr>
         {% endfor %}
       {% else %}
