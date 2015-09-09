@@ -108,6 +108,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.template.context_processors.csrf',
                 'django.template.context_processors.request',
+                'vac_templater.context_processors.datetime_format',
                 'vac_templater.context_processors.messages',
                 'vac_templater.context_processors.page_id',
                 'vac_templater.context_processors.is_production',

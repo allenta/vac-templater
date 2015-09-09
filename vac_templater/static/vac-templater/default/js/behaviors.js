@@ -336,6 +336,59 @@
   })();
 
   /******************************************************************************
+   * DATETIME INPUT.
+   ******************************************************************************/
+
+  (function () {
+    // Transform datetime strftm format used in Django to the format used by
+    // Moment.js (and therefore, by Bootstrap Datetimepicker).
+    // See https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
+    // See http://momentjs.com/docs/#/displaying/format/
+    var replacements = {
+      a: 'ddd',
+      A: 'dddd',
+      b: 'MMM',
+      B: 'MMMM',
+      d: 'DD',
+      e: 'D',
+      F: 'YYYY-MM-DD',
+      H: 'HH',
+      I: 'hh',
+      j: 'DDDD',
+      k: 'H',
+      l: 'h',
+      m: 'MM',
+      M: 'mm',
+      p: 'A',
+      S: 'ss',
+      u: 'E',
+      w: 'd',
+      W: 'WW',
+      y: 'YY',
+      Y: 'YYYY',
+      z: 'ZZ',
+      Z: 'z',
+      '%': '%'
+    };
+
+    var format = vac_templater.datetime_format.replace(
+      new RegExp(Object.keys(replacements).map(function(val) {
+        return '%' + val; }).join('|'), 'g'),
+      function myFunction(val) {
+        return replacements[val.substring(1)];
+      });
+
+    vac_templater.behaviors.datetime_input = {
+      attach: function(context) {
+        // Transform every datetime input into a Datetimepicker-enhanced input.
+        $('.datetime-input').datetimepicker({
+          format: format
+        });
+      }
+    };
+  })();
+
+  /******************************************************************************
    * REPEATABLE FIELD.
    ******************************************************************************/
 

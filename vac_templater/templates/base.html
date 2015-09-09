@@ -22,6 +22,7 @@
       page_id: '{{ page_id }}',
       language: '{{ LANGUAGE_CODE }}',
       timezone: '{{ TIME_ZONE }}',
+      datetime_format: '{{ datetime_format }}',
       https: {% settings_value 'HTTPS_ENABLED' 'json' %},
       version: {% settings_value 'VERSION' 'json' %},
       is_production: {% settings_value 'IS_PRODUCTION' 'json' %}

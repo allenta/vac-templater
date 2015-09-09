@@ -246,6 +246,11 @@ class DeployForm(forms.Form):
 
                 elif type(setting) == VACTemplaterTimeSetting:
                     field_attrs['localize'] = True
+                    field_attrs['widget'] = forms.DateTimeInput(
+                        attrs={
+                            'class': 'datetime-input',
+                        }
+                    )
 
                 elif type(setting) == VACTemplaterSelectSetting:
                     field_attrs['required'] = True

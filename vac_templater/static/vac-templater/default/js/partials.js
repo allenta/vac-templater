@@ -33,49 +33,6 @@
             $('button[value="deploy"]', context).click();
           }
         });
-
-        // Transform strftm format used in Django to the format used by Moment.js
-        // (and therefore, by Bootstrap Datetimepicker).
-        // See https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
-        // See http://momentjs.com/docs/#/displaying/format/
-        var replacements = {
-          a: 'ddd',
-          A: 'dddd',
-          b: 'MMM',
-          B: 'MMMM',
-          d: 'DD',
-          e: 'D',
-          F: 'YYYY-MM-DD',
-          H: 'HH',
-          I: 'hh',
-          j: 'DDDD',
-          k: 'H',
-          l: 'h',
-          m: 'MM',
-          M: 'mm',
-          p: 'A',
-          S: 'ss',
-          u: 'E',
-          w: 'd',
-          W: 'WW',
-          y: 'YY',
-          Y: 'YYYY',
-          z: 'ZZ',
-          Z: 'z',
-          '%': '%'
-        };
-
-        var format = options.datetime_format.replace(
-          new RegExp(Object.keys(replacements).map(function(val) {
-            return '%' + val; }).join('|'), 'g'),
-          function myFunction(val) {
-            return replacements[val.substring(1)];
-          });
-
-        // Transform time inputs into a Datetimepicker-enhanced input.
-        $('.form-group.time input').datetimepicker({
-          format: format
-        });
       }
     };
   };

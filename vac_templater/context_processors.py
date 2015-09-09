@@ -8,7 +8,14 @@
 from __future__ import absolute_import
 import json
 from django.conf import settings
+from django.utils import formats
 from vac_templater.helpers.views import get_messages
+
+
+def datetime_format(request):
+    return {
+        'datetime_format': formats.get_format('DATETIME_INPUT_FORMATS')[0],
+    }
 
 
 def messages(request):
