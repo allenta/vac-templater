@@ -16,8 +16,9 @@ from vac_templater.helpers.vac_templater_config import (
     VACTemplaterConfig, VACTemplaterUser, VACTemplaterTextSetting,
     VACTemplaterLongTextSetting, VACTemplaterIntegerSetting,
     VACTemplaterDurationSetting, VACTemplaterDuration,
-    VACTemplaterBooleanSetting, VACTemplaterACLSetting, VACTemplaterACL,
-    VACTemplaterSelectSetting, VACTemplaterGroupSetting)
+    VACTemplaterBooleanSetting, VACTemplaterTimeSetting,
+    VACTemplaterACLSetting, VACTemplaterACL, VACTemplaterSelectSetting,
+    VACTemplaterGroupSetting)
 from vac_templater.helpers.paginator import Paginator
 from vac_templater.models import Deployment
 
@@ -126,6 +127,7 @@ class DeployForm(forms.Form):
         VACTemplaterIntegerSetting: forms.IntegerField,
         VACTemplaterDurationSetting: DurationField,
         VACTemplaterBooleanSetting: forms.BooleanField,
+        VACTemplaterTimeSetting: forms.DateTimeField,
         VACTemplaterACLSetting: ACLField,
         VACTemplaterSelectSetting: forms.ChoiceField,
     }
@@ -241,6 +243,9 @@ class DeployForm(forms.Form):
 
                 elif type(setting) == VACTemplaterDurationSetting:
                     field_attrs['required'] = True
+
+                elif type(setting) == VACTemplaterTimeSetting:
+                    field_attrs['localize'] = True
 
                 elif type(setting) == VACTemplaterSelectSetting:
                     field_attrs['required'] = True

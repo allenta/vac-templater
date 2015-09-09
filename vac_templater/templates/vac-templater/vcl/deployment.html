@@ -23,37 +23,37 @@
   <form class="form-horizontal">
     <div class="well">
       <div class="form-group">
-        <label class="col-sm-2 control-label">Deployment id</label>
+        <label class="col-sm-2 control-label">{% trans 'Deployment id' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static">{{ deployment.id }}</p>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">Cache group</label>
+        <label class="col-sm-2 control-label">{% trans 'Cache group' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static">{{ deployment.group_name }} ({{ deployment.group_oid }})</p>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">VCL branch</label>
+        <label class="col-sm-2 control-label">{% trans 'VCL branch' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static">{{ deployment.branch_name }} ({{ deployment.branch_oid }})</p>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">VCL commits</label>
+        <label class="col-sm-2 control-label">{% trans 'VCL commits' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static">{{ deployment.old_head_oid }} → {{ deployment.new_head_oid }}</p>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">Deployed</label>
+        <label class="col-sm-2 control-label">{% trans 'Deployed' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static"><span data-toggle="tooltip" title="{{ deployment.created_at|date:"DATETIME_FORMAT" }}">{{ deployment.created_at|naturaltime }}</span></p>
         </div>
       </div>
       <div class="form-group">
-        <label class="col-sm-2 control-label">User</label>
+        <label class="col-sm-2 control-label">{% trans 'User' %}</label>
         <div class="col-sm-10">
           <p class="form-control-static">{{ deployment.user }}</p>
         </div>

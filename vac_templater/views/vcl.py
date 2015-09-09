@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views.generic import View
 from django.utils.decorators import method_decorator
+from django.utils import formats
 from django.utils.translation import ugettext as _
 from vac_templater import tasks
 from vac_templater.tasks.vac import PushVCLTask
@@ -118,6 +119,8 @@ class Deploy(Base):
             'context': {
                 'cache_group_form': cache_group_form,
                 'deploy_form': deploy_form,
+                'datetime_format': formats.get_format(
+                    'DATETIME_INPUT_FORMATS')[0]
             },
         }
 
