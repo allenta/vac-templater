@@ -610,8 +610,7 @@ class VACTemplaterIntegerSetting(VACTemplaterSetting):
         representation = representation or 'int'
 
         # Convert!
-        if representation == 'int' and \
-           raw_value.isdigit():
+        if representation == 'int':
             return int(raw_value)
         elif representation == 'str' and \
                 raw_value[0] == raw_value[-1] == '"':
@@ -652,7 +651,7 @@ class VACTemplaterIntegerSetting(VACTemplaterSetting):
 
         if 'max' in self.validators and \
            value > self.validators['max']:
-            errors.append(_('Value is too big. Maximum as %(max)d.') % {
+            errors.append(_('Value is too big. Maximum is %(max)d.') % {
                 'max': self.validators['max'],
             })
 
