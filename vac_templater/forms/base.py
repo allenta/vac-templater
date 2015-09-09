@@ -91,7 +91,7 @@ class RepeatableField(MultiValueField):
             # Make sure there's a value for every current widget.
             if value:
                 return value + [u''] * (len(self.widgets) - len(value))
-            return []
+            return [u''] * len(self.widgets)
 
     def __init__(self, reference_field, *args, **kwargs):
         self.reference_field = reference_field

@@ -51,7 +51,8 @@ class ACLField(forms.MultiValueField):
     def __init__(self, *args, **kwargs):
         field = RepeatableField(
             forms.CharField(required=False),
-            initial=kwargs['initial'].acls if 'initial' in kwargs else [])
+            initial=kwargs['initial'].acls if 'initial' in kwargs else [],
+            required=False)
         super(ACLField, self).__init__(
             fields=(
                 field,
@@ -217,6 +218,9 @@ class DeployForm(forms.Form):
                         field_attrs['min_value'] = \
                             setting.validators['min']
 
+                elif type(setting) == VACTemplaterDurationSetting:
+                    field_attrs['required'] = True
+
                 elif type(setting) == VACTemplaterSelectSetting:
                     field_attrs['required'] = True
                     field_attrs['choices'] = [
@@ -231,11 +235,11 @@ class DeployForm(forms.Form):
             for subsetting in setting.settings:
                 self._clean_setting(subsetting, cleaned_data)
         elif setting.role in self.vac_templater_user.roles:
+            field = self.fields[setting.id]
             value = cleaned_data.get(setting.id)
-            if value is not None:
+            if not (field.required and value is None):
                 try:
                     setting.validate(value)
-                    field = self.fields[setting.id]
                     prefixed_name = self.add_prefix(setting.id)
                     data_value = field.widget.value_from_datadict(
                         self.data, self.files, prefixed_name)
