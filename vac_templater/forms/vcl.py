@@ -12,7 +12,12 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from vac_templater.forms.base import FallbackIntegerField, FallbackCharField
 from vac_templater.forms.base import SortDirectionField, RepeatableField
-from vac_templater.helpers.vac_templater_config import VACTemplaterConfig, VACTemplaterUser, VACTemplaterTextSetting, VACTemplaterLongTextSetting, VACTemplaterIntegerSetting, VACTemplaterDurationSetting, VACTemplaterBooleanSetting, VACTemplaterACLSetting, VACTemplaterSelectSetting, VACTemplaterGroupSetting
+from vac_templater.helpers.vac_templater_config import (
+    VACTemplaterConfig, VACTemplaterUser, VACTemplaterTextSetting,
+    VACTemplaterLongTextSetting, VACTemplaterIntegerSetting,
+    VACTemplaterDurationSetting, VACTemplaterBooleanSetting,
+    VACTemplaterACLSetting, VACTemplaterSelectSetting,
+    VACTemplaterGroupSetting)
 from vac_templater.helpers.paginator import Paginator
 from vac_templater.models import Deployment
 

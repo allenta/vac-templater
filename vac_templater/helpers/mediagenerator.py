@@ -22,9 +22,9 @@ else:
 
 class I18N(i18n.I18N):
     def _generate(self, language):
-        # The mediagenerator I18N filter is not ready to be used with Django 1.8
-        # (see https://docs.djangoproject.com/en/1.8/ref/utils/#django.utils.translation.get_language).
-        # This is a temporary workaround while not fixed.
+        # The mediagenerator I18N filter is not ready to be used with Django
+        # 1.8. This is a temporary workaround while not fixed.
+        # See https://docs.djangoproject.com/en/1.8/ref/utils/#django.utils.translation.get_language
         with translation.override(language):
             return super(I18N, self)._generate(language)
 
@@ -45,7 +45,8 @@ class I18NFile(Filter):
 
     def get_dev_output_names(self, variation):
         filename = self._get_filename(variation['language'])
-        hash = sha1(smart_str(self._get_contents(variation['language']))).hexdigest()
+        hash = sha1(
+            smart_str(self._get_contents(variation['language']))).hexdigest()
         yield filename, hash
 
     def _get_contents(self, language):

@@ -12,7 +12,8 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
-from django.views.defaults import page_not_found, permission_denied, server_error
+from django.views.defaults import (
+    page_not_found, permission_denied, server_error)
 from vac_templater.views import base as base_views
 from vac_templater.views import vcl as vcl_views
 from vac_templater.views import task as task_views
