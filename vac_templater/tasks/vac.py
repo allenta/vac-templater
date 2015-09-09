@@ -98,7 +98,7 @@ class PushVCLTask(Task):
                     except VAC.Exception as e:
                         logging.getLogger('vac-templater').exception(e)
                         error = _('Failed to connect to the VAC. Is it '
-                                  'running?')
+                                  'running? Do yo have r/w access to it?')
                 else:
                     error = _('You must be authenticated to the VAC. '
                               'Reconnect and try again.')
