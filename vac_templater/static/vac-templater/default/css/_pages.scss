@@ -52,11 +52,14 @@ body.home-page {
       }
       input {
         display: inline-block;
-        width: 80%;
+        width: 78%;
       }
       select {
         display: inline-block;
         width: 20%;
+      }
+      .select2-container {
+        float: right;
       }
     }
     &.boolean input[type="checkbox"] {

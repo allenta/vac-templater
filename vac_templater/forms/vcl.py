@@ -98,6 +98,27 @@ class DurationField(forms.MultiValueField):
         return VACTemplaterDuration(data_list[0], data_list[1])
 
 
+class CacheGroupForm(forms.Form):
+    def __init__(self, vac, *args, **kwargs):
+        super(CacheGroupForm, self).__init__(*args, **kwargs)
+
+        # Dynamic cache group field.
+        self._groups = vac.groups()
+        self.fields['group'] = forms.ChoiceField(
+            choices=sorted(
+                [(group.id, group.name) for group in self._groups],
+                key=lambda item: item[1].lower()),
+            error_messages={
+                'invalid_choice': _('The selected group no longer exists.'),
+            },
+        )
+
+    def clean_group(self):
+        return next(
+            group for group in self._groups
+            if group.id == self.cleaned_data['group'])
+
+
 class DeployForm(forms.Form):
     FIELD_MAPPING = {
         VACTemplaterTextSetting: forms.CharField,

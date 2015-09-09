@@ -154,10 +154,10 @@
   };
 
   /******************************************************************************
-   * BOOTSTRAP INITIALIZATIONS.
+   * BOOTSTRAP.
    ******************************************************************************/
 
-  vac_templater.behaviors.bootstrap_initializations = {
+  vac_templater.behaviors.bootstrap = {
     attach: function(context) {
       // Popovers.
       $('[data-toggle="popover"]', context).popover({
@@ -167,6 +167,52 @@
 
       // Tooltips.
       $('[data-toggle="tooltip"]', context).tooltip();
+    }
+  };
+
+  /******************************************************************************
+   * SELECT2.
+   ******************************************************************************/
+
+  vac_templater.behaviors.select2 = {
+    attach: function(context) {
+      $('select', context).select2({
+        width: 'resolve',
+        language: {
+          errorLoading: function () {
+            return gettext('The results could not be loaded.');
+          },
+          inputTooLong: function (args) {
+            var overChars = args.input.length - args.maximum;
+            var fmts = ngettext(
+              'Please delete %s character',
+              'Please delete %s characters', overChars);
+            return interpolate(fmts, [overChars]);
+          },
+          inputTooShort: function (args) {
+            var remainingChars = args.minimum - args.input.length;
+            var fmts = ngettext(
+              'Please enter %s more character',
+              'Please enter %s more characters', remainingChars);
+            return interpolate(fmts, [remainingChars]);
+          },
+          loadingMore: function () {
+            return gettext('Loading more results...');
+          },
+          maximumSelected: function (args) {
+            var fmts = ngettext(
+              'You can only select %s item',
+              'You can only select %s items', args.maximum);
+            return interpolate(fmts, [args.maximum]);
+          },
+          noResults: function () {
+            return gettext('No results found');
+          },
+          searching: function () {
+            return gettext('Searching...');
+          }
+        }
+      });
     }
   };
 
