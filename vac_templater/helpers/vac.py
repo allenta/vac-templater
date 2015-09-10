@@ -151,7 +151,7 @@ class VAC(object):
             return None
 
     @restricted
-    def vcl_push(self, vcl_id, vcl_content, group_id=None):
+    def vcl_push(self, vcl_id, vcl_content, group_id=None, fallback_commit=None):
         '''Push a new VCL commit to a given VCL (branch).'''
         response = self._execute(
             'POST', '/api/v1/vcl/%(vcl_id)s/push' % {
@@ -162,15 +162,25 @@ class VAC(object):
             headers={'Content-Type': 'text/plain'})
         success = (response.status_code == 200)
 
-        # Optional: try to force group to reload the current head of the
-        # VCL branch immediately.
-        if success and group_id:
-            self._execute(
-                'PUT', '/api/v1/group/%(group_id)s/vcl/%(vcl_id)s/deploy' % {
-                    'group_id': group_id,
-                    'vcl_id': vcl_id,
-                },
-                codes=[200, 204])
+        if success:
+            # Optional: try to force group to reload the current head of the
+            # VCL branch immediately.
+            if group_id:
+                self._execute(
+                    'PUT', '/api/v1/group/%(group_id)s/vcl/%(vcl_id)s/deploy' % {
+                        'group_id': group_id,
+                        'vcl_id': vcl_id,
+                    },
+                    codes=[200, 204])
+        else:
+            # Optional: upon failure, rollback to a given VCL commit.
+            if fallback_commit:
+                self._execute(
+                    'POST', '/api/v1/vcl/%(vcl_id)s/push/%(vcl_commit_id)s' % {
+                        'vcl_id': vcl_id,
+                        'vcl_commit_id': fallback_commit,
+                    },
+                    codes=[200, 400])
 
         parsed_response = json.loads(response.text)
         return {

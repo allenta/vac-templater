@@ -41,7 +41,8 @@ class PushVCLTask(Task):
                                         result = vac.vcl_push(
                                             vcl.id,
                                             vcl_content,
-                                            group.id)
+                                            group.id,
+                                            vcl_commit_id)
 
                                         if result['success']:
                                             # Keep track of this deployment.
