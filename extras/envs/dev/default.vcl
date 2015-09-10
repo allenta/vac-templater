@@ -70,7 +70,6 @@ vcl 4.0;
  *     # all its child settings unless overridden.
  *     - backend:
  *         name: Backend
- *         description: Default backend definition
  *         type: group
  *         role: admin
  *         settings:
@@ -105,22 +104,6 @@ vcl 4.0;
  *                 options:
  *                   - normal
  *                   - cache-all
- *                   - maintenance
- *
- *           # 'time' settings accept the following validators: min and max,
- *           # both expressed as UNIX timestamps. Times always are converted to
- *           # a UNIX timestamp when they are included in VCL, but there are
- *           # two ways of representing them: as a real (real, default), or as
- *           # a string (str).
- *           - start:
- *               name: Start
- *               description: >
- *                   Delay the start of the currently selected mode by
- *                   selecting a date and time. Normal mode will remain active
- *                   until that date. Leave blank to apply changes immediately.
- *               type: time
- *               validators:
- *                 max: 1577836800
  *
  *           # 'duration' settings accept the following validators: min and max.
  *           - cache-all-ttl:
@@ -133,10 +116,33 @@ vcl 4.0;
  *                 min: 0s
  *                 max: 5m
  *
+ *     - maintenance:
+ *         name: Maintenance
+ *         description: >
+ *             If enabled, a static HTML page will be served to all clients
+ *             and no request will be passed to the backend.
+ *         type: group
+ *         role: admin
+ *         settings:
+ *           # 'time' settings accept the following validators: min and max,
+ *           # both expressed as UNIX timestamps. Times always are converted to
+ *           # a UNIX timestamp when they are included in VCL, but there are
+ *           # two ways of representing them: as a real (real, default), or as
+ *           # a string (str).
+ *           - start:
+ *               name: Start
+ *               description: >
+ *                   Schedule maintenance mode to start at a certain time. A
+ *                   date in the past will activate the mode immediately.
+ *                   Leave blank to keep it disabled.
+ *               type: time
+ *               validators:
+ *                 max: 1577836800
+ *
  *           # 'longtext' settings accept the following validators: min, max
  *           # (both refering to the text size) and regexp (a regular expression
  *           # that the text has to match).
- *           - maintenance-html:
+ *           - html:
  *               name: Maintenance mode HTML
  *               description: >
  *                   Static HTML that will be served to clients while in
@@ -164,16 +170,18 @@ backend default {
 sub vcl_init {
     # Set mode.
     var.global_set("mode", /* {{ modes:mode */"normal"/* }} */);
-    var.global_set("mode-start", /* {{ modes:start|str */"0.0"/* }} */);
 
     # Enable/disable debugging.
     var.global_set("debug", /* {{ debug|str */"0"/* }} */);
+
+    # Maintenance mode start time (UNIX timestamp, 0 means disabled).
+    var.global_set("maintenance-start", /* {{ maintenance:start|str */"0.00"/* }} */);
 }
 
 sub vcl_recv {
     # Maintenance mode?
-    if ((var.global_get("mode") == "maintenance") &&
-        (std.real2time(std.real(var.global_get("mode-start"), 0.0)) < now)) {
+    if ((std.real(var.global_get("maintenance-start"), 0.0) > 0.0) &&
+        (std.real2time(std.real(var.global_get("maintenance-start"), 0.0)) < now)) {
         return (synth(700, "Maintenance mode"));
     }
 
@@ -207,7 +215,7 @@ sub vcl_synth {
         set resp.http.Pragma = "no-cache";
         set resp.http.Expires = "0";
 
-        synthetic(/* {{ modes:maintenance-html */{"<!DOCTYPE html>
+        synthetic(/* {{ maintenance:html */{"<!DOCTYPE html>
 <html>
   <head>
     <title>Maintenance mode</title>
@@ -255,8 +263,7 @@ sub vcl_backend_response {
     }
 
     # Cache-all mode?
-    if ((var.global_get("mode") == "cache-all") &&
-        (std.real2time(std.real(var.global_get("mode-start"), 0.0)) < now)) {
+    if (var.global_get("mode") == "cache-all") {
         # Cache everything ignoring any cache headers.
         set beresp.ttl = /* {{ modes:cache-all-ttl */5m/* }} */;
     }
