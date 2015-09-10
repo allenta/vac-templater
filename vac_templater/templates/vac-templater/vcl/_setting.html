@@ -8,7 +8,7 @@
     <fieldset>
       <legend>{{ fieldset.legend }}</legend>
       {% if fieldset.description %}
-        <p class="fieldset-description">{{ fieldset.description }}</p>
+        <p class="help-block">{{ fieldset.description }}</p>
       {% endif %}
       {% for subsetting in fieldset.subsettings %}
         {% include 'vac-templater/vcl/_setting.html' with setting=subsetting form=form only %}

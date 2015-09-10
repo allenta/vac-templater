@@ -12,6 +12,7 @@ import time
 import yaml
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from django.utils import formats
 from django.utils.translation import ugettext as _
 
 
@@ -928,7 +929,8 @@ class VACTemplaterTimeSetting(VACTemplaterSetting):
            value < self.validators['min']:
             errors.append(
                 _('That\'s too soon. Earliest valid date is %(min)s.') % {
-                    'min': str(self.validators['min']),
+                    'min': formats.date_format(
+                        self.validators['min'], 'DATETIME_FORMAT'),
                 }
             )
 
@@ -937,7 +939,8 @@ class VACTemplaterTimeSetting(VACTemplaterSetting):
            value > self.validators['max']:
             errors.append(
                 _('That\'s too late. Latest valid date is %(max)s.') % {
-                    'max': str(self.validators['max']),
+                    'max': formats.date_format(
+                        self.validators['max'], 'DATETIME_FORMAT'),
                 }
             )
 
