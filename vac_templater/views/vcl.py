@@ -111,7 +111,8 @@ class Deploy(Base):
         except VAC.Exception as e:
             logging.getLogger('vac-templater').exception(e)
             messages.error(request, _(
-                'Failed to connect to the VAC. Is it running?'))
+                'Failed to connect to the VAC. Is it running? Do you have r/w '
+                'access to it?'))
 
         return {
             'template': 'vac-templater/vcl/deploy.html',
