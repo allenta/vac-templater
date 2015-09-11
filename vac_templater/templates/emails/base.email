@@ -5,17 +5,17 @@
 {% block subject %}{% settings_value 'EMAIL_SUBJECT_PREFIX' %}{% block subject_content %}{% endblock %}{% endblock %}
 
 {% block plain %}
-  {% capture contact_email %}{% settings_value 'CONTACT_EMAIL' %}{% endcapture %}
-  {% block plain_content %}{% endblock %}
+{% capture contact_email %}{% settings_value 'CONTACT_EMAIL' %}{% endcapture %}
+{% block plain_content %}{% endblock %}
 
-  --
-  VAC Templater
+--
+VAC Templater
 
-  {% blocktrans %}Please do not reply to this message; it was sent from an unmonitored e-mail
+{% blocktrans %}Please do not reply to this message; it was sent from an unmonitored e-mail
 address. To ensure reliable email delivery in the future, please add our
 e-mail address to your address book.{% endblocktrans %}
 
-  {% blocktrans %}This message is a service e-mail related to the VAC Templater
+{% blocktrans %}This message is a service e-mail related to the VAC Templater
 service. For general inquiries or to request support with your account,
 please contact us directly at {{contact_email}}.{% endblocktrans %}
 {% endblock %}

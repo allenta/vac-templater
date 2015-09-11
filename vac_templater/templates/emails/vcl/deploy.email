@@ -1,34 +1,83 @@
 {% extends "emails/base.email" %}
 {% load i18n %}
+{% load vac_templater_base_helpers %}
 
 {% block subject_content %}{% trans 'VCL deploy notification' %}{% endblock %}
 
 {% block plain_content %}
-  A new VCL has just been deployed!
+{% trans 'A new VCL has just been deployed!' %}
 
-  Deploy time: {{ deployment.created_at|date:"DATETIME_FORMAT" }}
-  User: {{ deployment.user.username }}
-  Cache group: {{ deployment.group_name }} ({{ deployment.group_oid }})
-  VCL Branch: {{ deployment.branch_name }} ({{ deployment.branch_oid }})
-  Old head: {{ deployment.old_head_oid }}
-  New head: {{ deployment.new_head_oid }}
+{% trans 'Deployment id' %}: {{ deployment.id }}
+{% trans 'Cache group' %}: {{ deployment.group_name }} ({{ deployment.group_oid }})
+{% trans 'VCL Branch' %}: {{ deployment.branch_name }} ({{ deployment.branch_oid }})
+{% trans 'Old head' %}: {{ deployment.old_head_oid }}
+{% trans 'New head' %}: {{ deployment.new_head_oid }}
+{% trans 'Deploy time' %}: {{ deployment.created_at|date:"DATETIME_FORMAT" }}
+{% trans 'User' %}: {{ deployment.user.username }}
 
-  {{ deployment.vcl }}
+{% trans 'Changes' %}
+
+{% if deployment.changes %}
+  {% for setting, from, to, groups in deployment.changes %}
+{% if groups %}{{ groups|join:' > ' }} > {% endif %}{{ setting }}
+
+{% trans 'Old value' %}:
+{% if from != None %}{{ from }}{% endif %}
+
+{% trans 'New value' %}:
+{% if to != None %}{{ to }}{% endif %}
+
+
+  {% endfor %}
+{% else %}
+{% trans 'No changes have been done in this commit.' %}
+{% endif %}
+
+{% capture deployment_url %}{{ base_url }}{% url 'vcl:deployment' deployment_id=deployment.id %}{% endcapture %}
+{% blocktrans %}View more at {{ deployment_url }}{% endblocktrans %}
 {% endblock %}
 
 {% block html_content %}
   {% autoescape on %}
-    <p>A new VCL has just been deployed!</p>
+    <p>{% trans 'A new VCL has just been deployed!' %}</p>
 
-    <dl>
-      <dt>Deploy time</dt><dd>{{ deployment.created_at|date:"DATETIME_FORMAT" }}</dd>
-      <dt>User</dt><dd>{{ deployment.user.username }}</dd>
-      <dt>Cache group</dt><dd>{{ deployment.group_name }} ({{ deployment.group_oid }})</dd>
-      <dt>VCL Branch</dt><dd>{{ deployment.branch_name }} ({{ deployment.branch_oid }})</dd>
-      <dt>Old head</dt><dd>{{ deployment.old_head_oid }}</dd>
-      <dt>New head</dt><dd>{{ deployment.new_head_oid }}</dd>
-    </dl>
+    <p>
+      <table border="1" width="100%" cellpadding="10">
+        <tr><th>{% trans 'Deployment id' %}</th><td>{{ deployment.id }}</td></tr>
+        <tr><th>{% trans 'Cache group' %}</th><td>{{ deployment.group_name }} ({{ deployment.group_oid }})</td></tr>
+        <tr><th>{% trans 'VCL Branch' %}</th><td>{{ deployment.branch_name }} ({{ deployment.branch_oid }})</td></tr>
+        <tr><th>{% trans 'Old head' %}</th><td>{{ deployment.old_head_oid }}</td></tr>
+        <tr><th>{% trans 'New head' %}</th><td>{{ deployment.new_head_oid }}</td></tr>
+        <tr><th>{% trans 'Deploy time' %}</th><td>{{ deployment.created_at|date:"DATETIME_FORMAT" }}</td></tr>
+        <tr><th>{% trans 'User' %}</th><td>{{ deployment.user.username }}</td></tr>
+      </table>
+    </p>
 
-    <pre>{{ deployment.vcl }}</pre>
+    <p>
+      <table border="1" width="100%" cellpadding="10">
+        <tr>
+          <th>{% trans 'Setting' %}</th>
+          <th>{% trans 'Old value' %}</th>
+          <th>{% trans 'New value' %}</th>
+        </tr>
+        {% if deployment.changes %}
+          {% for setting, from, to, groups in deployment.changes %}
+            <tr>
+              <td>
+                {% if groups %}{{ groups|join:' > ' }} > {% endif %}{{ setting }}
+              </td>
+              <td class="value">{% if from != None %}<pre>{{ from }}</pre>{% endif %}</td>
+              <td class="value">{% if to != None %}<pre>{{ to }}</pre>{% endif %}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="3">{% trans 'No changes have been done in this commit.' %}</td>
+          </tr>
+        {% endif %}
+      </table>
+    </p>
+
+    <p><a href="{{ base_url }}{% url 'vcl:deployment' deployment_id=deployment.id %}">{% trans 'View more' %}</a></p>
   {% endautoescape %}
 {% endblock %}
