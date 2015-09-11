@@ -261,10 +261,12 @@ class DeployForm(forms.Form):
                 # Build field.
                 self.fields[setting.id] = field_cls(**field_attrs)
 
-    def _clean_setting(self, setting, cleaned_data):
+    def _clean_setting(self, setting, cleaned_data, groups=None):
+        groups = groups or []
         if type(setting) == VACTemplaterGroupSetting:
+            groups.append(setting.name)
             for subsetting in setting.settings:
-                self._clean_setting(subsetting, cleaned_data)
+                self._clean_setting(subsetting, cleaned_data, groups)
         elif setting.role in self.vac_templater_user.roles:
             field = self.fields[setting.id]
             value = cleaned_data.get(setting.id)
@@ -278,7 +280,8 @@ class DeployForm(forms.Form):
                         self.changes.append(
                             (setting.name,
                              field.initial,
-                             value))
+                             value,
+                             groups))
                 except ValidationError as e:
                     for error in e.messages:
                         self.add_error(

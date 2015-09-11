@@ -69,9 +69,11 @@
         <th>{% trans 'New value' %}</th>
       </tr>
       {% if deployment.changes %}
-        {% for setting, from, to in deployment.changes %}
+        {% for setting, from, to, groups in deployment.changes %}
           <tr>
-            <td>{{ setting }}</td>
+            <td>
+              {% if groups %}{{ groups|join:' > ' }} > {% endif %}{{ setting }}
+            </td>
             <td class="value">{% if from != None %}{{ from }}{% endif %}</td>
             <td class="value">{% if to != None %}{{ to }}{% endif %}</td>
           </tr>
