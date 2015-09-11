@@ -63,26 +63,32 @@ class Deploy(Base):
                     data=request.POST if deploying else None)
                 if deploy_form.is_bound:
                     if deploy_form.is_valid():
-                        deploy_form.execute()
-                        token = tasks.enqueue(
-                            request,
-                            PushVCLTask,
-                            request.user.username,
-                            deploy_form.group.id,
-                            deploy_form.vcl_commit.id,
-                            deploy_form.new_vcl,
-                            deploy_form.changes,
-                            callback={
-                                'fn': (
-                                    'vac_templater.views.vcl.Deploy',
-                                    'callback',
-                                ),
-                                'context': {},
-                            })
+                        if deploy_form.changes:
+                            deploy_form.execute()
+                            token = tasks.enqueue(
+                                request,
+                                PushVCLTask,
+                                request.user.username,
+                                deploy_form.group.id,
+                                deploy_form.vcl_commit.id,
+                                deploy_form.new_vcl,
+                                deploy_form.changes,
+                                callback={
+                                    'fn': (
+                                        'vac_templater.views.vcl.Deploy',
+                                        'callback',
+                                    ),
+                                    'context': {},
+                                })
 
-                        return HttpResponseAjax([
-                            commands.show_progress(token),
-                        ], request)
+                            return HttpResponseAjax([
+                                commands.show_progress(token),
+                            ], request)
+                        else:
+                            messages.warning(
+                                request,
+                                _('No changes have been done to the settings. '
+                                  'There is no new VCL to be deployed.'))
                     else:
                         if deploy_form.non_field_errors():
                             for error in deploy_form.non_field_errors():
