@@ -5,7 +5,7 @@ VAC Templater developers are:
     - David Fuentes <davidfb@allenta.com>
 
 
-VAC Templater is sponsored by Allenta Consulting (http://allenta.com).
+VAC Templater is sponsored by Allenta Consulting (https://allenta.com).
 
     - For general inquiries, please, contact us directly at
     info@allenta.com.

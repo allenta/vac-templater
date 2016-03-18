@@ -14,7 +14,7 @@ Check out https://github.com/allenta/vac-templater for a detailed description,
 extra documentation, and other useful information.
 
 :copyright: (c) 2015 by Allenta Consulting, see AUTHORS.txt for more details.
-:license: GPL, see LICENSE.txt for more details.
+:license: BSD, see LICENSE.txt for more details.
 '''
 
 from __future__ import absolute_import
@@ -48,7 +48,7 @@ setup(
     url='https://www.allenta.com',
     description='VAC Templater.',
     long_description=__doc__,
-    license='GPL',
+    license='BSD',
     entry_points={
         'console_scripts': [
             'vac-templater = vac_templater.runner:main',
